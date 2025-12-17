@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Generator - Advanced Color Theory Tool</title>
+    <meta name="description"
+        content="Generate beautiful color palettes using advanced color theory principles with real-time preview and one-click copying">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-1: #667eea;
+            --accent-2: #764ba2;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --success-color: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #gradientBackground {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            display: flex;
+        }
+
+        .gradient-bar {
+            flex: 1;
+            transition: all 0.5s ease;
+        }
+
+        #bottomOverlay {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25%;
+            z-index: -1;
+            display: none;
+        }
+
+        #bottomOverlay.active {
+            display: block;
+        }
+
+        .radial-gradient {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        @keyframes moveGradient1 {
+
+            0%,
+            100% {
+                transform: translate(10%, 10%);
+            }
+
+            50% {
+                transform: translate(90%, 50%);
+            }
+        }
+
+        @keyframes moveGradient2 {
+
+            0%,
+            100% {
+                transform: translate(70%, 20%);
+            }
+
+            50% {
+                transform: translate(30%, 80%);
+            }
+        }
+
+        @keyframes moveGradient3 {
+
+            0%,
+            100% {
+                transform: translate(50%, 50%);
+            }
+
+            50% {
+                transform: translate(10%, 90%);
+            }
+        }
+
+        @keyframes moveGradient4 {
+
+            0%,
+            100% {
+                transform: translate(80%, 70%);
+            }
+
+            50% {
+                transform: translate(50%, 10%);
+            }
+        }
+
+        @keyframes moveGradient5 {
+
+            0%,
+            100% {
+                transform: translate(20%, 80%);
+            }
+
+            50% {
+                transform: translate(80%, 30%);
+            }
+        }
+
+        @keyframes moveGradient6 {
+
+            0%,
+            100% {
+                transform: translate(40%, 40%);
+            }
+
+            50% {
+                transform: translate(60%, 70%);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px var(--shadow-color);
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            padding: 0.5rem 0;
+        }
+
+        .collapsible-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .collapse-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.5rem;
+        }
+
+        .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .collapsible-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            animation: fadeIn 0.5s ease backwards;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .color-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+
+        input[type="color"] {
+            flex: 1;
+            height: 80px;
+            border: 3px solid var(--glass-border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        input[type="color"]:hover {
+            border-color: var(--accent-1);
+            transform: scale(1.02);
+        }
+
+        .opacity-slider-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 120px;
+        }
+
+        .opacity-slider-wrapper label {
+            margin-bottom: 0;
+            font-size: 0.8rem;
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        select:hover,
+        input[type="number"]:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-1);
+        }
+
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        select option {
+            background: #302b63;
+            color: var(--text-primary);
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .slider-value {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--accent-1);
+        }
+
+        .checkbox-label {
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            margin: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            box-shadow: none;
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .color-card {
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px var(--shadow-color);
+            border-color: var(--accent-1);
+        }
+
+        .color-swatch {
+            width: 100%;
+            height: 150px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-swatch::after {
+            content: 'Click to Copy';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .color-card:hover .color-swatch::after {
+            opacity: 1;
+        }
+
+        .color-info {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .color-hex {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .color-rgb {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .copied-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            font-weight: 600;
+            animation: slideInUp 0.3s ease, slideOutDown 0.3s ease 2s forwards;
+            z-index: 3000;
+        }
+
+        .export-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .export-modal.active {
+            display: flex;
+        }
+
+        .export-content {
+            background: #302b63;
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px var(--shadow-color);
+        }
+
+        .export-content h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .export-content textarea {
+            width: 100%;
+            min-height: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(100px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideOutDown {
+            to {
+                opacity: 0;
+                transform: translateY(100px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .palette-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 1rem;
+            }
+
+            .color-swatch {
+                height: 120px;
+            }
+
+            body {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="gradientBackground"></div>
+    <div id="bottomOverlay"></div>
+
+    <div class="container">
+        <header>
+            <h1>Color Palette Generator</h1>
+            <p class="subtitle">Create stunning color palettes using advanced color theory</p>
+        </header>
+
+        <div class="glass-panel">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="sourceColor">Source Color</label>
+                    <input type="color" id="sourceColor" value="#667eea">
+                </div>
+
+                <div class="control-group">
+                    <label for="colorMode">Color Theory Mode</label>
+                    <select id="colorMode">
+                        <option value="monochromatic">Monochromatic</option>
+                        <option value="complementary">Complementary</option>
+                        <option value="analogous">Analogous</option>
+                        <option value="triadic">Triadic</option>
+                        <option value="tetradic">Tetradic</option>
+                        <option value="split-complementary">Split Complementary</option>
+                        <option value="shades">Shades</option>
+                        <option value="tints">Tints</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Color Count: <span id="colorCountValue">5</span></label>
+                    <input type="range" id="colorCount" min="1" max="25" value="5">
+                </div>
+
+                <div class="control-group">
+                    <label>Opacity Step: <span id="opacityStepValue">0%</span></label>
+                    <input type="range" id="opacityStep" min="0" max="10" value="0" step="1">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="enableOpacity">
+                        <label for="enableOpacity" class="checkbox-label">Enable Progressive Opacity</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="generateBtn">Generate Palette</button>
+                <button id="exportBtn" class="secondary">Export Colors</button>
+                <button id="randomizeBtn" class="secondary">Randomize Source</button>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <div class="collapsible-header" id="colorCardsHeader">
+                <h3>Color Palette</h3>
+                <span class="collapse-icon">▼</span>
+            </div>
+            <div class="collapsible-content" id="colorCardsContent">
+                <div id="paletteGrid" class="palette-grid"></div>
+            </div>
+        </div>
+
+        <div class="glass-panel">
+            <div class="collapsible-header" id="overlayHeader">
+                <h3>Bottom Overlay Settings</h3>
+                <span class="collapse-icon collapsed">▼</span>
+            </div>
+            <div class="collapsible-content collapsed" id="overlayContent">
+                <div class="checkbox-container" style="margin-bottom: 1.5rem;">
+                    <input type="checkbox" id="enableOverlay">
+                    <label for="enableOverlay" class="checkbox-label">Enable Bottom Overlay</label>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="overlayColor">Overlay Color</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="overlayColor" value="#764ba2">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Overlay Opacity: <span id="overlayOpacityValue">50%</span></label>
+                        <input type="range" id="overlayOpacity" min="0" max="100" value="50">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="overlayBlendMode">Overlay Blend Mode</label>
+                        <select id="overlayBlendMode">
+                            <option value="normal">Normal</option>
+                            <option value="multiply">Multiply</option>
+                            <option value="screen">Screen</option>
+                            <option value="overlay">Overlay</option>
+                            <option value="darken">Darken</option>
+                            <option value="lighten">Lighten</option>
+                            <option value="color-dodge">Color Dodge</option>
+                            <option value="color-burn">Color Burn</option>
+                            <option value="hard-light">Hard Light</option>
+                            <option value="soft-light">Soft Light</option>
+                            <option value="difference">Difference</option>
+                            <option value="exclusion">Exclusion</option>
+                            <option value="hue">Hue</option>
+                            <option value="saturation">Saturation</option>
+                            <option value="color">Color</option>
+                            <option value="luminosity">Luminosity</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="gradientBlendMode">Gradient Blend Mode</label>
+                        <select id="gradientBlendMode">
+                            <option value="normal">Normal</option>
+                            <option value="multiply">Multiply</option>
+                            <option value="screen" selected>Screen</option>
+                            <option value="overlay">Overlay</option>
+                            <option value="darken">Darken</option>
+                            <option value="lighten">Lighten</option>
+                            <option value="color-dodge">Color Dodge</option>
+                            <option value="color-burn">Color Burn</option>
+                            <option value="hard-light">Hard Light</option>
+                            <option value="soft-light">Soft Light</option>
+                            <option value="difference">Difference</option>
+                            <option value="exclusion">Exclusion</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Animation Speed: <span id="animSpeedValue">10s</span></label>
+                        <input type="range" id="animSpeed" min="5" max="30" value="10" step="1">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Gradient Size: <span id="gradientSizeValue">400px</span></label>
+                        <input type="range" id="gradientSize" min="200" max="800" value="400" step="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="exportModal" class="export-modal">
+        <div class="export-content">
+            <h2>Export Color Palette</h2>
+            <textarea id="exportText" readonly></textarea>
+            <div class="export-buttons">
+                <button id="copyExportBtn">Copy to Clipboard</button>
+                <button id="closeModalBtn" class="secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Color utility functions
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => {
+                const hex = Math.round(x).toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            }).join('');
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+
+            return {
+                h: h * 360,
+                s: s * 100,
+                l: l * 100
+            };
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360;
+            s /= 100;
+            l /= 100;
+
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+
+            return {
+                r: r * 255,
+                g: g * 255,
+                b: b * 255
+            };
+        }
+
+        function normalizeHue(hue) {
+            while (hue < 0) hue += 360;
+            while (hue >= 360) hue -= 360;
+            return hue;
+        }
+
+        // Color theory generation functions
+        const colorTheory = {
+            monochromatic(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+
+                for (let i = 0; i < count; i++) {
+                    const factor = i / Math.max(count - 1, 1);
+                    const newL = Math.max(10, Math.min(90, hsl.l + (factor - 0.5) * 60));
+                    const newS = Math.max(10, Math.min(100, hsl.s + (factor - 0.5) * 40));
+                    const newRgb = hslToRgb(hsl.h, newS, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            },
+
+            complementary(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+                const complementHue = normalizeHue(hsl.h + 180);
+
+                for (let i = 0; i < count; i++) {
+                    const useComplement = i % 2 === 1;
+                    const hue = useComplement ? complementHue : hsl.h;
+                    const factor = Math.floor(i / 2) / Math.max(Math.floor(count / 2), 1);
+                    const newL = Math.max(20, Math.min(80, hsl.l + (factor - 0.5) * 40));
+                    const newRgb = hslToRgb(hue, hsl.s, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            },
+
+            analogous(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+                const hueRange = 60;
+
+                for (let i = 0; i < count; i++) {
+                    const factor = i / Math.max(count - 1, 1);
+                    const hueShift = (factor - 0.5) * hueRange;
+                    const newHue = normalizeHue(hsl.h + hueShift);
+                    const newL = Math.max(20, Math.min(80, hsl.l + (factor - 0.5) * 30));
+                    const newRgb = hslToRgb(newHue, hsl.s, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            },
+
+            triadic(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+                const hues = [hsl.h, normalizeHue(hsl.h + 120), normalizeHue(hsl.h + 240)];
+
+                for (let i = 0; i < count; i++) {
+                    const hueIndex = i % 3;
+                    const hue = hues[hueIndex];
+                    const factor = Math.floor(i / 3) / Math.max(Math.floor(count / 3), 1);
+                    const newL = Math.max(20, Math.min(80, hsl.l + (factor - 0.5) * 40));
+                    const newRgb = hslToRgb(hue, hsl.s, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            },
+
+            tetradic(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+                const hues = [hsl.h, normalizeHue(hsl.h + 90), normalizeHue(hsl.h + 180), normalizeHue(hsl.h + 270)];
+
+                for (let i = 0; i < count; i++) {
+                    const hueIndex = i % 4;
+                    const hue = hues[hueIndex];
+                    const factor = Math.floor(i / 4) / Math.max(Math.floor(count / 4), 1);
+                    const newL = Math.max(20, Math.min(80, hsl.l + (factor - 0.5) * 40));
+                    const newRgb = hslToRgb(hue, hsl.s, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            },
+
+            'split-complementary'(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+                const hues = [hsl.h, normalizeHue(hsl.h + 150), normalizeHue(hsl.h + 210)];
+
+                for (let i = 0; i < count; i++) {
+                    const hueIndex = i % 3;
+                    const hue = hues[hueIndex];
+                    const factor = Math.floor(i / 3) / Math.max(Math.floor(count / 3), 1);
+                    const newL = Math.max(20, Math.min(80, hsl.l + (factor - 0.5) * 40));
+                    const newRgb = hslToRgb(hue, hsl.s, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            },
+
+            shades(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+
+                for (let i = 0; i < count; i++) {
+                    const factor = i / Math.max(count - 1, 1);
+                    const newL = hsl.l * (1 - factor * 0.8);
+                    const newRgb = hslToRgb(hsl.h, hsl.s, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            },
+
+            tints(baseColor, count) {
+                const rgb = hexToRgb(baseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                const colors = [];
+
+                for (let i = 0; i < count; i++) {
+                    const factor = i / Math.max(count - 1, 1);
+                    const newL = hsl.l + (100 - hsl.l) * factor * 0.8;
+                    const newRgb = hslToRgb(hsl.h, hsl.s, newL);
+                    colors.push(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+                }
+
+                return colors;
+            }
+        };
+
+        // UI Elements
+        const sourceColorInput = document.getElementById('sourceColor');
+        const colorModeSelect = document.getElementById('colorMode');
+        const colorCountSlider = document.getElementById('colorCount');
+        const colorCountValue = document.getElementById('colorCountValue');
+        const opacityStepSlider = document.getElementById('opacityStep');
+        const opacityStepValue = document.getElementById('opacityStepValue');
+        const enableOpacityCheckbox = document.getElementById('enableOpacity');
+        const paletteGrid = document.getElementById('paletteGrid');
+        const generateBtn = document.getElementById('generateBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const randomizeBtn = document.getElementById('randomizeBtn');
+        const exportModal = document.getElementById('exportModal');
+        const exportText = document.getElementById('exportText');
+        const copyExportBtn = document.getElementById('copyExportBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const gradientBackground = document.getElementById('gradientBackground');
+        const bottomOverlay = document.getElementById('bottomOverlay');
+
+        // Overlay controls
+        const enableOverlay = document.getElementById('enableOverlay');
+        const overlayColor = document.getElementById('overlayColor');
+        const overlayOpacity = document.getElementById('overlayOpacity');
+        const overlayOpacityValue = document.getElementById('overlayOpacityValue');
+        const overlayBlendMode = document.getElementById('overlayBlendMode');
+        const gradientBlendMode = document.getElementById('gradientBlendMode');
+        const animSpeed = document.getElementById('animSpeed');
+        const animSpeedValue = document.getElementById('animSpeedValue');
+        const gradientSize = document.getElementById('gradientSize');
+        const gradientSizeValue = document.getElementById('gradientSizeValue');
+
+        // Collapsible headers
+        const colorCardsHeader = document.getElementById('colorCardsHeader');
+        const colorCardsContent = document.getElementById('colorCardsContent');
+        const overlayHeader = document.getElementById('overlayHeader');
+        const overlayContent = document.getElementById('overlayContent');
+
+        let currentPalette = [];
+
+        // Collapsible functionality
+        colorCardsHeader.addEventListener('click', () => {
+            colorCardsContent.classList.toggle('collapsed');
+            colorCardsHeader.querySelector('.collapse-icon').classList.toggle('collapsed');
+        });
+
+        overlayHeader.addEventListener('click', () => {
+            overlayContent.classList.toggle('collapsed');
+            overlayHeader.querySelector('.collapse-icon').classList.toggle('collapsed');
+        });
+
+        // Event listeners
+        colorCountSlider.addEventListener('input', (e) => {
+            colorCountValue.textContent = e.target.value;
+        });
+
+        opacityStepSlider.addEventListener('input', (e) => {
+            opacityStepValue.textContent = e.target.value + '%';
+        });
+
+        overlayOpacity.addEventListener('input', (e) => {
+            overlayOpacityValue.textContent = e.target.value + '%';
+            updateOverlay();
+        });
+
+        animSpeed.addEventListener('input', (e) => {
+            animSpeedValue.textContent = e.target.value + 's';
+            updateOverlay();
+        });
+
+        gradientSize.addEventListener('input', (e) => {
+            gradientSizeValue.textContent = e.target.value + 'px';
+            updateOverlay();
+        });
+
+        generateBtn.addEventListener('click', generatePalette);
+        exportBtn.addEventListener('click', showExportModal);
+        randomizeBtn.addEventListener('click', randomizeColor);
+        copyExportBtn.addEventListener('click', copyExport);
+        closeModalBtn.addEventListener('click', () => exportModal.classList.remove('active'));
+        exportModal.addEventListener('click', (e) => {
+            if (e.target === exportModal) exportModal.classList.remove('active');
+        });
+
+        sourceColorInput.addEventListener('change', generatePalette);
+        colorModeSelect.addEventListener('change', generatePalette);
+        colorCountSlider.addEventListener('change', generatePalette);
+        opacityStepSlider.addEventListener('change', generatePalette);
+        enableOpacityCheckbox.addEventListener('change', generatePalette);
+
+        enableOverlay.addEventListener('change', () => {
+            if (enableOverlay.checked) {
+                bottomOverlay.classList.add('active');
+            } else {
+                bottomOverlay.classList.remove('active');
+            }
+        });
+
+        overlayColor.addEventListener('change', updateOverlay);
+        overlayBlendMode.addEventListener('change', updateOverlay);
+        gradientBlendMode.addEventListener('change', updateOverlay);
+
+        function generatePalette() {
+            const sourceColor = sourceColorInput.value;
+            const mode = colorModeSelect.value;
+            const count = parseInt(colorCountSlider.value);
+            const opacityStep = parseInt(opacityStepSlider.value);
+            const enableOpacity = enableOpacityCheckbox.checked;
+
+            const colors = colorTheory[mode](sourceColor, count);
+            currentPalette = colors.map((color, index) => {
+                let opacity = 1;
+                if (enableOpacity && opacityStep > 0) {
+                    opacity = Math.max(0.1, 1 - (index * opacityStep / 100));
+                }
+                return { color, opacity };
+            });
+
+            renderPalette();
+            updateGradientBackground();
+        }
+
+        function renderPalette() {
+            paletteGrid.innerHTML = '';
+
+            currentPalette.forEach(({ color, opacity }) => {
+                const card = document.createElement('div');
+                card.className = 'color-card';
+
+                const rgb = hexToRgb(color);
+                const rgbaString = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity.toFixed(2)})`;
+
+                card.innerHTML = `
+                    <div class="color-swatch" style="background-color: ${rgbaString}"></div>
+                    <div class="color-info">
+                        <div class="color-hex">${color.toUpperCase()}</div>
+                        <div class="color-rgb">Opacity: ${(opacity * 100).toFixed(0)}%</div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => copyToClipboard(color, rgbaString));
+                paletteGrid.appendChild(card);
+            });
+        }
+
+        function updateGradientBackground() {
+            gradientBackground.innerHTML = '';
+            currentPalette.forEach(({ color }) => {
+                const bar = document.createElement('div');
+                bar.className = 'gradient-bar';
+                bar.style.backgroundColor = color;
+                gradientBackground.appendChild(bar);
+            });
+        }
+
+        function updateOverlay() {
+            const color = overlayColor.value;
+            const opacity = overlayOpacity.value / 100;
+            const rgb = hexToRgb(color);
+            const speed = animSpeed.value;
+            const size = gradientSize.value;
+
+            bottomOverlay.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+            bottomOverlay.style.mixBlendMode = overlayBlendMode.value;
+
+            // Create 6 radial gradients
+            bottomOverlay.innerHTML = '';
+            const gradientColors = [
+                '#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#fd79a8'
+            ];
+
+            for (let i = 0; i < 6; i++) {
+                const gradient = document.createElement('div');
+                gradient.className = 'radial-gradient';
+                gradient.style.background = `radial-gradient(circle, ${gradientColors[i]} 0%, transparent 70%)`;
+                gradient.style.width = size + 'px';
+                gradient.style.height = size + 'px';
+                gradient.style.animation = `moveGradient${i + 1} ${speed}s ease-in-out infinite`;
+                gradient.style.mixBlendMode = gradientBlendMode.value;
+                bottomOverlay.appendChild(gradient);
+            }
+        }
+
+        function copyToClipboard(hex, rgba) {
+            navigator.clipboard.writeText(hex).then(() => {
+                showNotification(`Copied: ${hex}`);
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'copied-notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 2500);
+        }
+
+        function randomizeColor() {
+            const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            sourceColorInput.value = randomColor;
+            generatePalette();
+        }
+
+        function showExportModal() {
+            const exportData = {
+                sourceColor: sourceColorInput.value,
+                mode: colorModeSelect.value,
+                count: parseInt(colorCountSlider.value),
+                opacityStep: parseInt(opacityStepSlider.value),
+                enableOpacity: enableOpacityCheckbox.checked,
+                palette: currentPalette.map(({ color, opacity }) => ({
+                    hex: color,
+                    opacity: opacity,
+                    rgba: (() => {
+                        const rgb = hexToRgb(color);
+                        return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity.toFixed(2)})`;
+                    })()
+                }))
+            };
+
+            let exportString = `Color Palette Export\n`;
+            exportString += `====================\n\n`;
+            exportString += `Source Color: ${exportData.sourceColor}\n`;
+            exportString += `Mode: ${exportData.mode}\n`;
+            exportString += `Count: ${exportData.count}\n\n`;
+            exportString += `Colors:\n`;
+            exportString += `-------\n`;
+
+            exportData.palette.forEach((color, index) => {
+                exportString += `${index + 1}. ${color.hex} - ${color.rgba}\n`;
+            });
+
+            exportString += `\n\nCSS Variables:\n`;
+            exportString += `--------------\n`;
+            exportData.palette.forEach((color, index) => {
+                exportString += `--color-${index + 1}: ${color.hex};\n`;
+            });
+
+            exportString += `\n\nJSON Format:\n`;
+            exportString += `------------\n`;
+            exportString += JSON.stringify(exportData, null, 2);
+
+            exportText.value = exportString;
+            exportModal.classList.add('active');
+        }
+
+        function copyExport() {
+            exportText.select();
+            navigator.clipboard.writeText(exportText.value).then(() => {
+                showNotification('Export copied to clipboard!');
+            });
+        }
+
+        // Initialize
+        generatePalette();
+        updateOverlay();
+    </script>
+</body>
+
+</html>
